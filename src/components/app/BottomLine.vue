@@ -1,9 +1,4 @@
 <script setup>
-
-import SelectAll from "@/components/btnIcons/SelectAll.vue";
-import Delete from "@/components/btnIcons/Delete.vue";
-import Pencil from "@/components/btnIcons/Pencil.vue";
-import Sort from "@/components/btnIcons/Sort.vue";
 </script>
 
 <template>

@@ -47,7 +47,6 @@ const closeModal = (e) => {
                 </label>
                 <TodoInput type="date" name="date" :value="todoListStorage.modalItem?.date ?? ''"/>
                 <div class="modal__footer">
-<!--                    <button class="btn btn__submit" type="submit">Добавить</button>-->
                     <BtnSmall type="submit" class="primary">{{ Object.keys(todoListStorage.modalItem).length ? 'Изменить' : 'Добавить' }}</BtnSmall>
                     <BtnSmall @click.prevent="todoListStorage.actionModalSwitch()">Отменить</BtnSmall>
                 </div>
@@ -58,7 +57,6 @@ const closeModal = (e) => {
 
 <style lang="scss">
 .modal{
-    //display: none;
     display: flex;
     align-items: center;
     justify-content: center;

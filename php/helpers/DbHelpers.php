@@ -1,7 +1,5 @@
 <?php
 
-//require_once 'DbConnect.php';
-
 class DbHelpers
 {
 
@@ -109,8 +107,6 @@ class DbHelpers
         $this->connect();
 
         $idStr = implode(', ', $data);
-
-//        return [$data];
 
         $sql = "DELETE FROM $table WHERE id in ($idStr)";
 
