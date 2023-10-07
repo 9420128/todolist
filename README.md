@@ -1,4 +1,8 @@
-# todo
+# TodoList
+php 8.1
+mySQL 5.7
+vue 3 composition api
+pinia
 
 ## Project setup
 ```
