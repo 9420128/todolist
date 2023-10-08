@@ -67,7 +67,6 @@ const closeModal = (e) => {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.4);
 
     &__container{
@@ -85,7 +84,7 @@ const closeModal = (e) => {
             margin: 0;
             font-size: 1.1em;
             font-weight: bold;
-            border-bottom: 1px solid #e4e4e4;
+            border-bottom: 1px solid var(--solid);
 
             &.reset{
                 border: none;
@@ -99,7 +98,7 @@ const closeModal = (e) => {
         gap: .5em;
         margin-top: 1em;
         height: 3em;
-        border-top: 1px solid #e4e4e4;
+        border-top: 1px solid var(--solid);
         padding: 0 1em;
 
         .btn-small{
