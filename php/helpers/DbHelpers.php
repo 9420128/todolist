@@ -5,11 +5,37 @@ class DbHelpers
 
     protected $pdo = null;
 
-    public function connect(){
+    protected string $dsn;
+    protected string $username;
+    protected string $password;
+
+    /**
+     * Конструктор класса DbHelpers.
+     * @param string $dsn - строка подключения к базе данных.
+     * @param string $username - имя пользователя базы данных.
+     * @param string $password - пароль пользователя базы данных.
+     */
+    public function __construct(string $dsn, string $username, string $password)
+    {
+
+        $this->dsn = $dsn;
+        $this->username = $username;
+        $this->password = $password;
+
+    }
+
+    /**
+     * Устанавливает соединение с базой данных.
+     * @return array|null - возвращает массив с информацией об ошибке или null в случае успешного подключения.
+     */
+    public function connect()
+    {
 
         try {
 
-            $this->pdo = new PDO("mysql:host=localhost;dbname=strugigkru_todo;charset=utf8", 'strugigkru_todo', 'xX123456');
+            $this->pdo = new PDO($this->dsn, $this->username, $this->password);
+            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, false);
 
         }
         catch (PDOException $i){
@@ -17,9 +43,16 @@ class DbHelpers
             return ['message' => 'Ошибка подключения к базе данных', 'type' => 'error'];
 
         }
+
     }
 
-    public function get($table = 'todo_list', $set = []): bool|array
+    /**
+     * Извлекает данные из указанной таблицы.
+     * @param string $table - имя таблицы.
+     * @param array $set - дополнительные параметры, например, 'limit' для ограничения количества записей.
+     * @return bool|array - возвращает ассоциативный массив с данными, либо false в случае ошибки.
+     */
+    public function get(string $table = 'todo_list', array $set = []): bool|array
     {
 
         $limit = !empty($set['limit']) ? 'LIMIT ' . $set['limit'] : '';
@@ -51,10 +84,18 @@ class DbHelpers
 
     }
 
+    /**
+     * add - Добавляет новую запись в указанную таблицу.
+     * edit - Изменяет запись.
+     * delete - Удаляет запись.
+     * @param string $table - имя таблицы.
+     * @param array $post - ассоциативный массив с данными для добавления.
+     * @return array - возвращает массив с результатом операции.
+     */
     public function add(string $table, array $post): array
     {
 
-        [$key, $value] = $this->_postToStringAdd($post);
+        [$key, $value] = $this->_convertPostToSQLStrings($post);
 
         $sql = "INSERT INTO $table ($key) VALUES ($value)";
 
@@ -77,7 +118,7 @@ class DbHelpers
     public function edit(string $table, array $data): array
     {
 
-        $execStr = $this->_postToStringSet($data[0]);
+        $execStr = $this->_postToSqlUpdateString($data[0]);
 
         $this->connect();
 
@@ -122,49 +163,54 @@ class DbHelpers
 
     }
 
-    /* helpers function */
-
-    protected function _postToStringAdd(array $post): array
+    /**
+     * helpers functions
+     *
+     * Преобразует данные из ассоциативного массива в строки для использования в SQL-запросах.
+     *
+     * @param array $post - ассоциативный массив с данными.
+     *
+     * @return array - возвращает массив с ключами 'keys' и 'values'.
+     */
+    protected function _convertPostToSQLStrings(array $post): array
     {
+        $keys = $values = '';
 
-        $key = $value = '';
+        foreach ($post as $key => $value) {
 
-        foreach ($post as $k => $item) {
-
-            if(!empty($item)) {
-
-                $key .= $k . ', ';
-                $value .= "'" . $item . "', ";
-
+            if (!empty($value)) {
+                $keys .= $key . ', ';
+                $values .= "'" . $this->_escapeString($value) . "', ";
             }
 
         }
 
-        $key = substr($key,0,-2);
-        $value = substr($value,0,-2);
+        $keys = rtrim($keys, ', ');
+        $values = rtrim($values, ', ');
 
-        return [$key, $value];
+        return ['keys' => $keys, 'values' => $values];
     }
 
-    protected function _postToStringSet(array $data): string
+    protected function _escapeString(string $input): string|int
     {
+        // Здесь можно экранировать специальные символы
+        // Для обеспечения безопасности и избежания SQL-инъекций
 
-        $execStr = '';
+        return $input;
 
-        foreach ($data as $key => $item) {
+    }
 
-            if($key !== 'id') {
+    protected function _postToSqlUpdateString(array $data): string
+    {
+        $setClauses = [];
 
-                $execStr .= $key . '= :' . $key . ', ';
-
+        foreach ($data as $key => $value) {
+            if ($key !== 'id') {
+                $setClauses[] = $key . ' = :' . $key;
             }
-
         }
 
-        /* $execStr return id = :id, statuses = :statuses, name = :name */
-
-        return substr($execStr,0,-2);
-
+        return implode(', ', $setClauses);
     }
 
 }

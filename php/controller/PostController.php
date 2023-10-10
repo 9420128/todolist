@@ -2,9 +2,13 @@
 
 require_once '../helpers/DbHelpers.php';
 
+// Проверяем, что запрос пришел методом POST и данные являются массивом
+
 if($_SERVER["REQUEST_METHOD"] == "POST" && is_array($_POST)){
 
-    $dbHelpers = new DbHelpers();
+    $dbHelpers = new DbHelpers('mysql:host=localhost;dbname=strugigkru_todo;charset=utf8', 'strugigkru_todo', 'xX123456');
+
+    // Очищаем каждый элемент массива $_POST от лишних пробелов
 
     foreach ($_POST as $i => $item) {
 
@@ -12,11 +16,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && is_array($_POST)){
 
     }
 
+    // Если массив $_POST пуст, пытаемся прочитать данные из тела запроса в формате JSON
+
     if(!count($_POST)) {
 
         $_POST = json_decode(file_get_contents('php://input'), true);
 
     }
+
+    // Если в массиве $_POST есть ключ 'actions'
 
     if (!empty($_POST['actions'])) {
 
@@ -75,7 +83,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && is_array($_POST)){
 
         }
 
+        // Возвращаем результат операции в формате JSON
+
         echo json_encode($data);
+
+        // Завершаем выполнение скрипта
 
         return true;
 
